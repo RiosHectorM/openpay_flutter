@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
             title: const Text('Nuevo Usuario'),
             subtitle: const Text('Agregar Nuevo Usuario al Sistema'),
             trailing: const Icon(Icons.person_add_alt_sharp),
-            onTap: () => context.push('/addUser'),
+            onTap: () => context.push('/new-user'),
           ),
           ListTile(
             title: const Text('Buscar Sucursales cercanas'),
