@@ -12,15 +12,17 @@ class UserRepositoryImpl implements UserRepository {
 
   UserRepositoryImpl(this.apiClient);
 
+  //Llamada para la creacion de un Cliente
   @override
   Future<void> createUser(Map<String, dynamic> userData) async {
     try {
       await apiClient.createUser(userData);
     } catch (error) {
-      throw Exception('Error al crear el usuario: $error');
+      throw Exception('Error al crear el Cliente: $error');
     }
   }
 
+  //Llamada para la obtencion de la lista de Clientes
   @override
   Future<List<Map<String, dynamic>>> getListOfClients() async {
     try {
@@ -31,22 +33,23 @@ class UserRepositoryImpl implements UserRepository {
     }
   }
 
+  //Llamada para la eliminacion de un Cliente por su ID
   @override
   Future<void> deleteUser(String customerId) async {
     try {
       await apiClient.deleteUser(customerId);
     } catch (error) {
-      throw Exception('Error al eliminar el usuario: $error');
+      throw Exception('Error al eliminar el Cliente: $error');
     }
   }
 
+  //Llamada para la modificacion de un Cliente por su ID
   @override
   Future<void> editUser(String id, Map<String, dynamic> userData) async {
     try {
-      await apiClient.editUser(id, userData); // Llama a la función editUser de OpenPayApi
+      await apiClient.editUser(id, userData); 
     } catch (error) {
-      throw Exception('Error al editar el usuario: $error');
+      throw Exception('Error al editar el Cliente: $error');
     }
   }
-
 }

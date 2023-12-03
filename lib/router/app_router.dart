@@ -11,5 +11,8 @@ final appRouter = GoRouter(routes: [
       path: '/list-clients',
       builder: (context, state) => ListClientsScreen(),
     ),
-
+  GoRoute(
+      path: '/list-markets',
+      builder: (context, state) => ListMarketScreen(),
+    ),
 ]);

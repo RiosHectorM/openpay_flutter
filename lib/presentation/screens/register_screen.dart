@@ -16,7 +16,7 @@ class RegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Editar Usuario' : 'Nuevo Usuario'),
+        title: Text(isEditing ? 'Editar Cliente' : 'Nuevo Cliente'),
       ),
       body: _RegisterView(
           userRepository: userRepository, isEditing: isEditing, client: client),
@@ -75,7 +75,7 @@ class _RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<_RegisterForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController; // Nuevo controlador
+  late TextEditingController _nameController;
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneNumberController;
@@ -96,7 +96,6 @@ class _RegisterFormState extends State<_RegisterForm> {
 
   @override
   void dispose() {
-    // Dispose de los controladores para evitar memory leaks
     _nameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
@@ -112,23 +111,23 @@ class _RegisterFormState extends State<_RegisterForm> {
         children: [
           const SizedBox(height: 8),
           CustomTextFormField(
-            label: 'Nombre de usuario',
-            controller: _nameController, // Nuevo controlador
+            label: 'Nombre de Cliente',
+            controller: _nameController, 
             validator: (value) {
               if (value == null || value.isEmpty) return 'Campo requerido';
               if (value.trim().isEmpty) return 'Campo requerido';
-              if (value.length < 4) return 'Más de 4 letras';
+              if (value.length < 4) return 'Mas de 4 letras';
               return null;
             },
           ),
           const SizedBox(height: 10),
           CustomTextFormField(
-            label: 'Apellido de usuario',
+            label: 'Apellido de Cliente',
             controller: _lastNameController,
           ),
           const SizedBox(height: 10),
           CustomTextFormField(
-            label: 'Correo electrónico',
+            label: 'Correo electronico',
             controller: _emailController,
             validator: (value) {
               if (value == null || value.isEmpty) return 'Campo requerido';
@@ -163,22 +162,24 @@ class _RegisterFormState extends State<_RegisterForm> {
 
               try {
                 if (widget.isEditing) {
-                  // Lógica para editar el cliente existente
+                  // Logica para editar el cliente existente
                   try {
                     await widget.userRepository
                         .editUser(widget.client!['id'], userData);
-                    // Mostrar SnackBar de éxito
+                    // Mostrar SnackBar de exito
+                    // ignore: use_build_context_synchronously
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Usuario Editado exitosamente'),
+                        content: Text('Cliente Editado exitosamente'),
                         backgroundColor: Colors.green,
                       ),
                     );
                   } catch (error) {
                     // Mostrar SnackBar de error
+                    // ignore: use_build_context_synchronously
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Error al Editar el usuario: $error'),
+                        content: Text('Error al Editar el Cliente: $error'),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -186,10 +187,12 @@ class _RegisterFormState extends State<_RegisterForm> {
                 } else {
                   await widget.userRepository.createUser(userData);
                 }
-                // Volver a la pantalla anterior
+                // Vuelve a la pantalla anterior
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context);
               } catch (error) {
                 // Mostrar SnackBar de error
+                // ignore: use_build_context_synchronously
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Error: $error'),
@@ -199,7 +202,7 @@ class _RegisterFormState extends State<_RegisterForm> {
               }
             },
             icon: const Icon(Icons.save),
-            label: Text(widget.isEditing ? 'Guardar cambios' : 'Crear usuario'),
+            label: Text(widget.isEditing ? 'Guardar cambios' : 'Crear Cliente'),
           ),
         ],
       ),
