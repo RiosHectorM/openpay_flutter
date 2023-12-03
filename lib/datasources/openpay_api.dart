@@ -72,4 +72,28 @@ class OpenPayApi {
       throw Exception('Error en la solicitud (eliminar usuario): $error');
     }
   }
+  
+  Future<void> editUser(String id, Map<String, dynamic> userData) async {
+    try {
+      final response = await _dio.put(
+        'https://sandbox-api.openpay.mx/v1/mur2pss0enug2z7k4zlr/customers/$id',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': dotenv.env['API_KEY'],
+          },
+        ),
+        data: userData,
+      );
+
+      // Manejar la respuesta según la necesidad
+      print('Respuesta del servidor (editar usuario): ${response.data}');
+    } catch (error) {
+      // Manejar errores
+      print('Error en la solicitud (editar usuario): $error');
+      throw Exception('Error en la solicitud (editar usuario): $error');
+    }
+  }
 }
+
+

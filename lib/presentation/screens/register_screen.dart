@@ -6,24 +6,35 @@ import 'package:dio/dio.dart';
 
 class RegisterScreen extends StatelessWidget {
   final UserRepository userRepository = UserRepositoryImpl(OpenPayApi(Dio()));
+  final bool isEditing;
+  final Map<String, dynamic>? client;
 
-  RegisterScreen({Key? key}) : super(key: key);
+  RegisterScreen({Key? key, required this.isEditing, this.client})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nuevo Usuario'),
+        title: Text(isEditing ? 'Editar Usuario' : 'Nuevo Usuario'),
       ),
-      body: _RegisterView(userRepository: userRepository),
+      body: _RegisterView(
+          userRepository: userRepository, isEditing: isEditing, client: client),
     );
   }
 }
 
 class _RegisterView extends StatelessWidget {
   final UserRepository userRepository;
+  final bool isEditing;
+  final Map<String, dynamic>? client;
 
-  const _RegisterView({Key? key, required this.userRepository}) : super(key: key);
+  const _RegisterView({
+    Key? key,
+    required this.userRepository,
+    required this.isEditing,
+    required this.client,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +44,10 @@ class _RegisterView extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _RegisterForm(userRepository: userRepository),
+              _RegisterForm(
+                  userRepository: userRepository,
+                  isEditing: isEditing,
+                  client: client),
               const SizedBox(height: 20),
             ],
           ),
@@ -45,8 +59,15 @@ class _RegisterView extends StatelessWidget {
 
 class _RegisterForm extends StatefulWidget {
   final UserRepository userRepository;
+  final bool isEditing;
+  final Map<String, dynamic>? client;
 
-  const _RegisterForm({Key? key, required this.userRepository}) : super(key: key);
+  const _RegisterForm({
+    Key? key,
+    required this.userRepository,
+    required this.isEditing,
+    required this.client,
+  }) : super(key: key);
 
   @override
   State<_RegisterForm> createState() => _RegisterFormState();
@@ -54,11 +75,34 @@ class _RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<_RegisterForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String name = '';
-  String lastName = '';
-  String email = '';
-  String phoneNumber = '';
-  String address = '';
+  late TextEditingController _nameController; // Nuevo controlador
+  late TextEditingController _lastNameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneNumberController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final clientData = widget.client;
+
+    _nameController = TextEditingController(text: clientData?['name'] ?? '');
+    _lastNameController =
+        TextEditingController(text: clientData?['last_name'] ?? '');
+    _emailController = TextEditingController(text: clientData?['email'] ?? '');
+    _phoneNumberController =
+        TextEditingController(text: clientData?['phone_number'] ?? '');
+  }
+
+  @override
+  void dispose() {
+    // Dispose de los controladores para evitar memory leaks
+    _nameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +113,7 @@ class _RegisterFormState extends State<_RegisterForm> {
           const SizedBox(height: 8),
           CustomTextFormField(
             label: 'Nombre de usuario',
-            onChanged: (value) => name = value,
+            controller: _nameController, // Nuevo controlador
             validator: (value) {
               if (value == null || value.isEmpty) return 'Campo requerido';
               if (value.trim().isEmpty) return 'Campo requerido';
@@ -80,12 +124,12 @@ class _RegisterFormState extends State<_RegisterForm> {
           const SizedBox(height: 10),
           CustomTextFormField(
             label: 'Apellido de usuario',
-            onChanged: (value) => lastName = value,
+            controller: _lastNameController,
           ),
           const SizedBox(height: 10),
           CustomTextFormField(
             label: 'Correo electrónico',
-            onChanged: (value) => email = value,
+            controller: _emailController,
             validator: (value) {
               if (value == null || value.isEmpty) return 'Campo requerido';
               if (value.trim().isEmpty) return 'Campo requerido';
@@ -102,48 +146,61 @@ class _RegisterFormState extends State<_RegisterForm> {
           const SizedBox(height: 10),
           CustomTextFormField(
             label: 'Telefono',
-            onChanged: (value) => phoneNumber = value,
+            controller: _phoneNumberController,
           ),
           const SizedBox(height: 20),
           FilledButton.tonalIcon(
-          onPressed: () async {
-            final isValid = _formKey.currentState!.validate();
-            if (!isValid) return;
+            onPressed: () async {
+              final isValid = _formKey.currentState!.validate();
+              if (!isValid) return;
 
-            final userData = {
-              'name': name,
-              'last_name': lastName,
-              'email': email,
-              'phone_number': phoneNumber,
-            };
+              final userData = {
+                'name': _nameController.text,
+                'last_name': _lastNameController.text,
+                'email': _emailController.text,
+                'phone_number': _phoneNumberController.text,
+              };
 
-            try {
-              await widget.userRepository.createUser(userData);
-              // Mostrar SnackBar de éxito
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Usuario creado exitosamente'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-
-              // Volver a la pantalla anterior
-              Navigator.pop(context);
-
-            } catch (error) {
-              // Mostrar SnackBar de error
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error al crear el usuario: $error'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          icon: const Icon(Icons.save),
-          label: const Text('Crear usuario'),
-        ),
-
+              try {
+                if (widget.isEditing) {
+                  // Lógica para editar el cliente existente
+                  try {
+                    await widget.userRepository
+                        .editUser(widget.client!['id'], userData);
+                    // Mostrar SnackBar de éxito
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Usuario Editado exitosamente'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } catch (error) {
+                    // Mostrar SnackBar de error
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error al Editar el usuario: $error'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                } else {
+                  await widget.userRepository.createUser(userData);
+                }
+                // Volver a la pantalla anterior
+                Navigator.pop(context);
+              } catch (error) {
+                // Mostrar SnackBar de error
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error: $error'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.save),
+            label: Text(widget.isEditing ? 'Guardar cambios' : 'Crear usuario'),
+          ),
         ],
       ),
     );

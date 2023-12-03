@@ -5,7 +5,7 @@ final appRouter = GoRouter(routes: [
   GoRoute(path: '/', builder: ((context, state) => const HomeScreen())),
   GoRoute(
       path: '/new-client',
-      builder: (context, state) => RegisterScreen(),
+      builder: (context, state) => RegisterScreen(isEditing: false),
     ),
   GoRoute(
       path: '/list-clients',

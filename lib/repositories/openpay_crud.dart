@@ -4,6 +4,7 @@ abstract class UserRepository {
   Future<void> createUser(Map<String, dynamic> userData);
   Future<List<Map<String, dynamic>>> getListOfClients();
   Future<void> deleteUser(String id);
+  Future<void> editUser(String id, Map<String, dynamic> userData);
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -38,4 +39,14 @@ class UserRepositoryImpl implements UserRepository {
       throw Exception('Error al eliminar el usuario: $error');
     }
   }
+
+  @override
+  Future<void> editUser(String id, Map<String, dynamic> userData) async {
+    try {
+      await apiClient.editUser(id, userData); // Llama a la función editUser de OpenPayApi
+    } catch (error) {
+      throw Exception('Error al editar el usuario: $error');
+    }
+  }
+
 }
