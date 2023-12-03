@@ -127,6 +127,9 @@ class _RegisterFormState extends State<_RegisterForm> {
                 ),
               );
 
+              // Volver a la pantalla anterior
+              Navigator.pop(context);
+
             } catch (error) {
               // Mostrar SnackBar de error
               ScaffoldMessenger.of(context).showSnackBar(

@@ -40,9 +40,22 @@ class _ListClientsScreenState extends State<ListClientsScreen> {
         title: const Text('Lista de Clientes'),
       ),
       body: clients.isEmpty
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? FutureBuilder(
+            future: Future.delayed(Duration(seconds: 2)), // Espera 2 segundos
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Mientras espera, muestra el indicador de carga
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                // Después de esperar, muestra el mensaje "Sin clientes"
+                return const Center(
+                  child: Text('No hay Clientes'),
+                );
+              }
+            },
+          )
           : ListView.builder(
               itemCount: clients.length,
               itemBuilder: (context, index) {
@@ -92,8 +105,11 @@ class _ListClientsScreenState extends State<ListClientsScreen> {
               },
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push('/new-client');
+        onPressed: () async {
+          await context.push('/new-client').then((_) 
+          async {
+            await fetchListOfClients(); 
+          });
         },
         child: const Icon(Icons.person_add),
       ),
