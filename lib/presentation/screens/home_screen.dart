@@ -10,13 +10,13 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
-            title: const Text('Nuevo Usuario'),
-            subtitle: const Text('Agregar Nuevo Usuario al Sistema'),
+            title: const Text('Clientes'),
+            subtitle: const Text('Agregar Nuevo Cliente'),
             trailing: const Icon(Icons.person_add_alt_sharp),
-            onTap: () => context.push('/new-user'),
+            onTap: () => context.push('/list-clients'),
           ),
           ListTile(
-            title: const Text('Buscar Sucursales cercanas'),
+            title: const Text('Sucursales'),
             subtitle: const Text('Listado de Sucursales cercanas a tu posicion'),
             trailing: const Icon(Icons.map_rounded),
             onTap: () => context.push('/locationsNearby'),

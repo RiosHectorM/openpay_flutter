@@ -66,6 +66,7 @@ class _RegisterFormState extends State<_RegisterForm> {
       key: _formKey,
       child: Column(
         children: [
+          const SizedBox(height: 8),
           CustomTextFormField(
             label: 'Nombre de usuario',
             onChanged: (value) => name = value,
