@@ -29,7 +29,7 @@ class _RegisterView extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -55,9 +55,9 @@ class _RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<_RegisterForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String name = '';
-  String last_name = '';
+  String lastName = '';
   String email = '';
-  String phone_number = '';
+  String phoneNumber = '';
   String address = '';
 
   @override
@@ -72,14 +72,14 @@ class _RegisterFormState extends State<_RegisterForm> {
             validator: (value) {
               if (value == null || value.isEmpty) return 'Campo requerido';
               if (value.trim().isEmpty) return 'Campo requerido';
-              if (value.length < 6) return 'Más de 6 letras';
+              if (value.length < 4) return 'Más de 4 letras';
               return null;
             },
           ),
           const SizedBox(height: 10),
           CustomTextFormField(
             label: 'Apellido de usuario',
-            onChanged: (value) => last_name = value,
+            onChanged: (value) => lastName = value,
           ),
           const SizedBox(height: 10),
           CustomTextFormField(
@@ -101,32 +101,45 @@ class _RegisterFormState extends State<_RegisterForm> {
           const SizedBox(height: 10),
           CustomTextFormField(
             label: 'Telefono',
-            onChanged: (value) => phone_number = value,
+            onChanged: (value) => phoneNumber = value,
           ),
           const SizedBox(height: 20),
           FilledButton.tonalIcon(
-            onPressed: () async {
-              final isValid = _formKey.currentState!.validate();
-              if (!isValid) return;
+          onPressed: () async {
+            final isValid = _formKey.currentState!.validate();
+            if (!isValid) return;
 
-              final userData = {
-                'name': name,
-                'last_name': last_name,
-                'email': email,
-                'phone_number': phone_number,
-              };
+            final userData = {
+              'name': name,
+              'last_name': lastName,
+              'email': email,
+              'phone_number': phoneNumber,
+            };
 
-              try {
-                // Reemplaza 'TU_API_KEY_AQUI' con tu clave de API real
-                await widget.userRepository.createUser(userData);
-                print('Usuario creado exitosamente');
-              } catch (error) {
-                print('Error al crear el usuario: $error');
-              }
-            },
-            icon: const Icon(Icons.save),
-            label: const Text('Crear usuario'),
-          ),
+            try {
+              await widget.userRepository.createUser(userData);
+              // Mostrar SnackBar de éxito
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Usuario creado exitosamente'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+
+            } catch (error) {
+              // Mostrar SnackBar de error
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error al crear el usuario: $error'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          icon: const Icon(Icons.save),
+          label: const Text('Crear usuario'),
+        ),
+
         ],
       ),
     );
