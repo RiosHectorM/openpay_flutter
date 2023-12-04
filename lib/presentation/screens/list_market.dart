@@ -76,51 +76,60 @@ class _ListMarketScreenState extends State<ListMarketScreen> {
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(width: 2),
           const Text(
             'Seleccione ciudad:',
             style: TextStyle(
               fontSize: 16.0,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.bold,              
             ),
           ),
-          const SizedBox(width: 10.0),
-          DropdownButton<String>(
-            value: selectedCity?.name,
-            onChanged: (String? newValue) async {
-              setState(() {
-                selectedCity = getMexicanCities()
-                    .firstWhere((city) => city.name == newValue);
-                isLoading = true;
-              });
-
-              if (selectedCity != null) {
-                try {
-                  final marketList =
-                      await widget.marketRepository.getListOfMarkets(
-                    latitude: selectedCity?.latitude,
-                    longitude: selectedCity?.longitude,
-                  );
-
-                  setState(() {
-                    markets = marketList;
-                    isLoading = false;
-                  });
-                } catch (error) {
-                  setState(() {
-                    isLoading = false;
-                  });
-                  throw Exception(
-                      'Error al obtener la lista de Sucursales: $error');
+          const Spacer(flex: 1),
+          Container(
+            margin: const EdgeInsets.all(4.0),
+            decoration: BoxDecoration(
+              color: Colors.blue[100],  // Cambia esto al color de fondo deseado
+              borderRadius: BorderRadius.circular(10.0),  // Ajusta el radio del borde según tus preferencias
+              border: Border.all(color: Colors.blue),  // Ajusta el color del borde según tus preferencias
+            ),
+            child: DropdownButton<String>(
+              value: selectedCity?.name,
+              onChanged: (String? newValue) async {
+                setState(() {
+                  selectedCity = getMexicanCities()
+                      .firstWhere((city) => city.name == newValue);
+                  isLoading = true;
+                });
+            
+                if (selectedCity != null) {
+                  try {
+                    final marketList =
+                        await widget.marketRepository.getListOfMarkets(
+                      latitude: selectedCity?.latitude,
+                      longitude: selectedCity?.longitude,
+                    );
+            
+                    setState(() {
+                      markets = marketList;
+                      isLoading = false;
+                    });
+                  } catch (error) {
+                    setState(() {
+                      isLoading = false;
+                    });
+                    throw Exception(
+                        'Error al obtener la lista de Sucursales: $error');
+                  }
                 }
-              }
-            },
-            items:
-                getMexicanCities().map<DropdownMenuItem<String>>((City value) {
-              return DropdownMenuItem<String>(
-                value: value.name,
-                child: Text(value.name),
-              );
-            }).toList(),
+              },
+              items:
+                  getMexicanCities().map<DropdownMenuItem<String>>((City value) {
+                return DropdownMenuItem<String>(
+                  value: value.name,
+                  child: Text(value.name),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),
