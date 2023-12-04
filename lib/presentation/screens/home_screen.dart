@@ -7,24 +7,52 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //Menu Principal Clientes / Sucursales
+      appBar: AppBar(
+        title: const Text('Menú Principal'),
+      ),
       body: ListView(
+        padding: const EdgeInsets.all(16.0),
         children: [
-          ListTile(
-            title: const Text('Clientes'),
-            subtitle: const Text('Agregar, Editar o Eliminar Clientes'),
-            trailing: const Icon(Icons.person_add_alt_sharp),
-            onTap: () => context.push('/list-clients'),
+          buildCard(
+            'Clientes',
+            'Agregar, Editar o Eliminar Clientes',
+            Icons.people_alt_outlined,
+            () => context.push('/list-clients'),
           ),
-          ListTile(
-            title: const Text('Sucursales'),
-            subtitle: const Text('Listado de Sucursales cercanas por ciudad'),
-            trailing: const Icon(Icons.map_rounded),
-            onTap: () => context.push('/list-markets'),
-          )
+          const SizedBox(height: 16.0),
+          buildCard(
+            'Sucursales',
+            'Listado de Sucursales cercanas por ciudad',
+            Icons.account_balance_outlined,
+            () => context.push('/list-markets'),
+          ),
         ],
       ),
     );
   }
-}
 
+  Widget buildCard(String title, String subtitle, IconData icon, VoidCallback onTap) {
+    return Card(
+      elevation: 5.0,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(icon, size: 40.0),
+              const SizedBox(height: 8.0),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8.0),
+              Text(subtitle),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

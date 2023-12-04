@@ -5,7 +5,8 @@ import 'package:openpay_flutter/datasources/market_list_api.dart';
 import 'package:openpay_flutter/datasources/cordinates.dart';
 
 class ListMarketScreen extends StatefulWidget {
-  final MarketRepository marketRepository = MarketRepositoryImpl(MarketApi(Dio()));
+  final MarketRepository marketRepository =
+      MarketRepositoryImpl(MarketApi(Dio()));
 
   ListMarketScreen({super.key});
 
@@ -23,19 +24,79 @@ class _ListMarketScreenState extends State<ListMarketScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Seleccione una ciudad:'),
-        actions: [
+        title: const Text('Sucursales por Ciudad'),
+      ),
+      body: selectedCity == null
+      ? const Center(
+          child: Text('Seleccione una ciudad ver las Sucursales'),
+        )
+      : isLoading
+      ? const Center(
+          child: CircularProgressIndicator(),
+        )
+      : markets.isEmpty
+          ? const Center(
+              child: Text('No hay sucursales disponibles.'),
+            )
+          : ListView.builder(
+              itemCount: markets.length * 2 - 1,
+              itemBuilder: (context, index) {
+                if (index.isOdd) {
+                  // Si es impar, devuelve un Divider
+                  return const Divider();
+                } else {
+                  // Si es par, devuelve un ListTile
+                  final marketIndex = index ~/ 2;
+                  final market = markets[marketIndex];
+                  return ListTile(
+                    title: Text(
+                      market['name'] ?? '',
+                      textAlign: TextAlign.left,
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          market['address']['line1'] ?? '',
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                            (market['address']['line2'] ?? '') +
+                                ' ' +
+                                (market['address']['state'] ?? ''),
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  );
+                }
+              },
+            ),
+      bottomNavigationBar: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Seleccione ciudad:',
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 10.0),
           DropdownButton<String>(
             value: selectedCity?.name,
             onChanged: (String? newValue) async {
               setState(() {
-                selectedCity = getMexicanCities().firstWhere((city) => city.name == newValue);
+                selectedCity = getMexicanCities()
+                    .firstWhere((city) => city.name == newValue);
                 isLoading = true;
               });
 
               if (selectedCity != null) {
                 try {
-                  final marketList = await widget.marketRepository.getListOfMarkets(
+                  final marketList =
+                      await widget.marketRepository.getListOfMarkets(
                     latitude: selectedCity?.latitude,
                     longitude: selectedCity?.longitude,
                   );
@@ -48,11 +109,13 @@ class _ListMarketScreenState extends State<ListMarketScreen> {
                   setState(() {
                     isLoading = false;
                   });
-                  throw Exception('Error al obtener la lista de Sucursales: $error');
+                  throw Exception(
+                      'Error al obtener la lista de Sucursales: $error');
                 }
               }
             },
-            items: getMexicanCities().map<DropdownMenuItem<String>>((City value) {
+            items:
+                getMexicanCities().map<DropdownMenuItem<String>>((City value) {
               return DropdownMenuItem<String>(
                 value: value.name,
                 child: Text(value.name),
@@ -61,52 +124,6 @@ class _ListMarketScreenState extends State<ListMarketScreen> {
           ),
         ],
       ),
-      body: selectedCity == null
-        ? const Center(
-            child: Text('Seleccione una ciudad ver las Sucursales'),
-          )
-        : isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : markets.isEmpty
-            ? const Center(
-                child: Text('No hay sucursales disponibles.'),
-              )
-            : ListView.builder(
-                itemCount: markets.length * 2 - 1,
-                itemBuilder: (context, index) {
-                  if (index.isOdd) {
-                    // Si es impar, devuelve un Divider
-                    return const Divider();
-                  } else {
-                    // Si es par, devuelve un ListTile
-                    final marketIndex = index ~/ 2;
-                    final market = markets[marketIndex];
-                    return ListTile(
-                      title: Text(
-                        market['name'] ?? '',
-                        textAlign: TextAlign.left,
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            market['address']['line1'] ?? '',
-                            textAlign: TextAlign.left,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            (market['address']['line2'] ?? '') + ' ' + (market['address']['state'] ?? ''),
-                            textAlign: TextAlign.left,
-                            overflow: TextOverflow.ellipsis
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                },
-              ),
     );
   }
 }
