@@ -64,14 +64,8 @@ Follow these steps to set up and run the project locally:
 
 ## Configuration
 
-Before running the application, make sure to set up your environment variables. Create a `.env` file at the root of the project and add the necessary API keys:
-
-```dotenv
-API_KEY=your_received_api_key
-```
-## Configuration
-
 Before running the application, ensure you have an API key for authentication. You will receive the API key via email. Create a `.env` file at the root of the project and add the API key:
 
 ```dotenv
 API_KEY=your_received_api_key
+```
